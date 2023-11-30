@@ -5,4 +5,6 @@
 I'll just be documenting my attempts/takes on this year's AOC.
 
 ### Shoutout
-[![Chris Biscardi AOC](https://i.ytimg.com/an_webp/fEQv-cqzbPg/mqdefault_6s.webp?du=3000&sqp=CKD0oqsG&rs=AOn4CLCaIJRU_qD-dnd6HAGwDjp7cTvxAw)](https://www.youtube.com/watch?v=fEQv-cqzbPg)
+Thank you to Chris for getting me excited for this year's AOC and some good tips for doing it in Rust.
+
+[![Chris Biscardi AOC](https://i3.ytimg.com/vi/fEQv-cqzbPg/maxresdefault.jpg)](https://www.youtube.com/watch?v=fEQv-cqzbPg)
