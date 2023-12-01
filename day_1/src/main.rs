@@ -24,6 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn answer(data: &str, part2: bool) -> i32 {
     let mut result = 0;
     for line in data.split('\n') {
+        // println!("{}", first_number(line, part2) * 10 + last_number(line, part2));
         result += first_number(line, part2) * 10 + last_number(line, part2)
     }
     result
