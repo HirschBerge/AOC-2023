@@ -1,0 +1,118 @@
+use regex::Regex;
+use std::collections::HashMap;
+use std::fs::read_to_string;
+fn read_lines(filename: &str) -> Vec<String> {
+    let mut result = Vec::new();
+
+    for line in read_to_string(filename).unwrap().lines() {
+        result.push(line.to_string())
+    }
+
+    result
+}
+fn part_1(output: Vec<String>) -> i32 {
+    let mut sum = 0;
+    for line in output {
+        let last = line
+            .chars()
+            .filter(|c| c.is_numeric())
+            .last()
+            .to_owned()
+            .unwrap()
+            .to_string();
+        let first = line
+            .chars()
+            .filter(|c| c.is_numeric())
+            .nth(0)
+            .to_owned()
+            .unwrap()
+            .to_string();
+        let digis = format!("{}{}", first, last).parse().unwrap_or(0);
+        println!("{}: {}", line, &digis);
+        sum += digis;
+        // println!("Running total: {}", sum);
+        // println!("{}: {}", line, digis)
+    }
+    sum
+}
+fn part_2(output: Vec<String>) -> i32 {
+    let mut numbas = HashMap::new();
+    numbas.insert("zero", "0");
+    numbas.insert("oneight", "18");
+    numbas.insert("one", "1");
+    numbas.insert("twone", "21");
+    numbas.insert("two", "2");
+    numbas.insert("threeight", "38");
+    numbas.insert("three", "3");
+    numbas.insert("four", "4");
+    numbas.insert("fiveight", "58");
+    numbas.insert("nineight", "98");
+    numbas.insert("nine", "9");
+    numbas.insert("five", "5");
+    numbas.insert("six", "6");
+    numbas.insert("sevenine", "79");
+    numbas.insert("seven", "7");
+    numbas.insert("eightwo", "82");
+    numbas.insert("eighthree", "83");
+    numbas.insert("eight", "8");
+
+    let mut p2ified: Vec<String> = Vec::new();
+    for line in &output {
+        let mut new_line = line.to_string();
+
+        for (key, value) in &numbas {
+            let formatted = format!(r"{}", key);
+            let re = Regex::new(formatted.as_str()).expect("Invalid regex");
+
+            if re.is_match(&new_line) {
+                new_line = re.replace_all(&new_line, *value).to_string();
+            }
+        }
+
+        // println!("{}", new_line);
+        p2ified.push(new_line);
+    }
+    // let p1 = part_1(output);
+    let p2 = part_1(p2ified);
+    p2
+    // println!("{}", p2)
+    // println!("Part 1: {}\nPart 2: {}", p1, p2);
+}
+fn main() {
+    let output = read_lines("input.txt");
+    let p1 = part_1(output.clone());
+    let p2 = part_2(output);
+    println!("Part 1: {}\nPart 2: {}", p1, p2);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part1() {
+        let data: Vec<String> = vec![
+            "1abc2".to_string(),
+            "pqr3stu8vwx".to_string(),
+            "a1b2c3d4e5f".to_string(),
+            "treb7uchet".to_string(),
+        ];
+        let part1_res = part_1(data);
+        assert_eq!(part1_res, 142);
+    }
+
+    #[test]
+    fn test_part2() {
+        let data = vec![
+            "two1nine".to_string(),
+            "eightwothree".to_string(),
+            "abcone2threexyz".to_string(),
+            "xtwone3four".to_string(),
+            "4nineeightseven2".to_string(),
+            "zoneight234".to_string(),
+            "7pqrstsixteen".to_string(),
+        ];
+        let part1_res = part_2(data);
+        assert_eq!(part1_res, 281);
+    }
+}
