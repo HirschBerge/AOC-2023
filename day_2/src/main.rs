@@ -20,19 +20,19 @@ fn return_colors(txt: &str, re: Regex) -> Vec<u32> {
 
 fn answer(data: String, color_totals: HashMap<&str, u32>, p2: bool) -> Result<u32, Box<dyn Error>> {
     let mut total_valid_sum = 0;
-    let mut p2_total: u32 = 0;
+    let mut p2_sum: u32 = 0;
     for line in data.split('\n') {
         let id_re = Regex::new(r"Game (\d+)").unwrap();
         let game_id = return_game_id(line, id_re).unwrap();
         let mut invalid_game = false;
-        let mut cubed: u32 = 1;
+        let mut power: u32 = 1;
         for color in "red green blue".split_whitespace() {
             let color_re_value = format!(r"(\d+) {}", color);
             let color_re = Regex::new(&color_re_value).unwrap();
             let color_count = return_colors(line, color_re);
             if p2 {
                 let max = color_count.iter().max().unwrap();
-                cubed *= max;
+                power *= max;
             }
             if color_count
                 .iter()
@@ -41,13 +41,13 @@ fn answer(data: String, color_totals: HashMap<&str, u32>, p2: bool) -> Result<u3
                 invalid_game = true;
             }
         }
-        p2_total += cubed;
+        p2_sum += power;
         if !invalid_game {
             total_valid_sum += game_id.parse::<u32>().unwrap();
         }
     }
     if p2 {
-        Ok(p2_total)
+        Ok(p2_sum)
     } else {
         Ok(total_valid_sum)
     }
@@ -58,11 +58,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     color_totals.insert("red", 12);
     color_totals.insert("green", 13);
     color_totals.insert("blue", 14);
-    println!(
-        "Part 1: {:?}",
-        answer(data.clone(), color_totals.clone(), false).unwrap()
-    );
-    println!("Part 2: {:?}", answer(data, color_totals, true).unwrap());
+    let part = 2;
+    // let part = 2;
+    if 1 == part {
+        println!(
+            "Part 1: {:?}",
+            answer(data.clone(), color_totals.clone(), false).unwrap()
+        );
+    } else if 2 == part {
+        println!("Part 2: {:?}", answer(data, color_totals, true).unwrap());
+    } else {
+        panic!("Expected part 1 or 2, instead found {part}")
+    }
     Ok(())
 }
 #[cfg(test)]
