@@ -29,39 +29,21 @@ fn answer(data: String, color_totals: HashMap<&str, u32>, p2: bool) -> Result<u3
         for color in "red green blue".split_whitespace() {
             let color_re_value = format!(r"(\d+) {}", color);
             let color_re = Regex::new(&color_re_value).unwrap();
-            // println!("{}", &color_re_value);
             let color_count = return_colors(line, color_re);
             if p2 {
                 let max = color_count.iter().max().unwrap();
                 cubed *= max;
             }
-            // println!(
-            //     "Game ID: {}, Color: {}, Count: {:?}",
-            //     game_id, color, color_count
-            // );
-
             if color_count
                 .iter()
                 .any(|&number| number > *color_totals.get(color).unwrap_or(&0))
-            {
-                // println!(
-                //     "Invalid Game ID: {} {} was greater than {}",
-                //     game_id, color, color_totals[color]
-                // );
-                invalid_game = true;
-                // break;
-            }
+            {}
         }
         p2_total += cubed;
-        // dbg!(&cubed, &p2_total);
-
         if !invalid_game {
-            // println!("Valid Game ID: {}", game_id);
             total_valid_sum += game_id.parse::<u32>().unwrap();
         }
-        // println!("{game_id}");
     }
-    // println!("{total_valid_sum}");
     if p2 {
         Ok(p2_total)
     } else {
@@ -74,7 +56,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     color_totals.insert("red", 12);
     color_totals.insert("green", 13);
     color_totals.insert("blue", 14);
-    // dbg!(color_totals);
     println!(
         "Part 1: {:?}",
         answer(data.clone(), color_totals.clone(), false).unwrap()
