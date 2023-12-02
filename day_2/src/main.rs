@@ -37,7 +37,9 @@ fn answer(data: String, color_totals: HashMap<&str, u32>, p2: bool) -> Result<u3
             if color_count
                 .iter()
                 .any(|&number| number > *color_totals.get(color).unwrap_or(&0))
-            {}
+            {
+                invalid_game = true;
+            }
         }
         p2_total += cubed;
         if !invalid_game {
