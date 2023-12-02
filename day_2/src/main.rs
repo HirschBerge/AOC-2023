@@ -18,17 +18,23 @@ fn return_colors(txt: &str, re: Regex) -> Vec<u32> {
         .collect()
 }
 
-fn answer(data: String, color_totals: HashMap<&str, u32>) -> Result<u32, Box<dyn Error>> {
+fn answer(data: String, color_totals: HashMap<&str, u32>, p2: bool) -> Result<u32, Box<dyn Error>> {
     let mut total_valid_sum = 0;
+    let mut p2_total: u32 = 0;
     for line in data.split('\n') {
         let id_re = Regex::new(r"Game (\d+)").unwrap();
         let game_id = return_game_id(line, id_re).unwrap();
         let mut invalid_game = false;
+        let mut cubed: u32 = 1;
         for color in "red green blue".split_whitespace() {
             let color_re_value = format!(r"(\d+) {}", color);
             let color_re = Regex::new(&color_re_value).unwrap();
             // println!("{}", &color_re_value);
             let color_count = return_colors(line, color_re);
+            if p2 {
+                let max = color_count.iter().max().unwrap();
+                cubed *= max;
+            }
             // println!(
             //     "Game ID: {}, Color: {}, Count: {:?}",
             //     game_id, color, color_count
@@ -38,23 +44,29 @@ fn answer(data: String, color_totals: HashMap<&str, u32>) -> Result<u32, Box<dyn
                 .iter()
                 .any(|&number| number > *color_totals.get(color).unwrap_or(&0))
             {
-                println!(
-                    "Invalid Game ID: {} {} was greater than {}",
-                    game_id, color, color_totals[color]
-                );
+                // println!(
+                //     "Invalid Game ID: {} {} was greater than {}",
+                //     game_id, color, color_totals[color]
+                // );
                 invalid_game = true;
-                break;
+                // break;
             }
         }
+        p2_total += cubed;
+        // dbg!(&cubed, &p2_total);
 
         if !invalid_game {
-            println!("Valid Game ID: {}", game_id);
+            // println!("Valid Game ID: {}", game_id);
             total_valid_sum += game_id.parse::<u32>().unwrap();
         }
         // println!("{game_id}");
     }
-    println!("{total_valid_sum}");
-    Ok((total_valid_sum))
+    // println!("{total_valid_sum}");
+    if p2 {
+        Ok(p2_total)
+    } else {
+        Ok(total_valid_sum)
+    }
 }
 fn main() -> Result<(), Box<dyn Error>> {
     let data = get_daily_input(2, 2023)?;
@@ -63,7 +75,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     color_totals.insert("green", 13);
     color_totals.insert("blue", 14);
     // dbg!(color_totals);
-    let _ = answer(data, color_totals);
+    println!(
+        "Part 1: {:?}",
+        answer(data.clone(), color_totals.clone(), false).unwrap()
+    );
+    println!("Part 2: {:?}", answer(data, color_totals, true).unwrap());
     Ok(())
 }
 #[cfg(test)]
@@ -82,6 +98,21 @@ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
             .to_string();
-        assert_eq!(answer(data, color_totals).unwrap(), 8)
+        assert_eq!(answer(data, color_totals, false).unwrap(), 8)
+    }
+    #[test]
+    fn part_2_test() {
+        let mut color_totals = HashMap::new();
+        color_totals.insert("red", 12);
+        color_totals.insert("green", 13);
+        color_totals.insert("blue", 14);
+
+        let data = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
+            .to_string();
+        assert_eq!(answer(data, color_totals, true).unwrap(), 2286)
     }
 }
