@@ -11,7 +11,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn part_1() -> Result<(), Box<dyn Error>> {
+    fn part_1() -> Result<(), Box<dyn std::error::Error>> {
         let data = "".to_string();
         assert_eq!("13".to_string(), insert_name(data)?);
         Ok(())

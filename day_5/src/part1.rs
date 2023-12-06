@@ -55,7 +55,7 @@ fn seed_map(input: &str) -> IResult<&str, SeedMap> {
         .precedes(many1(line_ending.precedes(line)).map(|mappings| SeedMap { mappings }))
         .parse(input)
 }
-// #[tracing::instrument(skip(input), fields(input_first_line = input.split("\n").next().unwrap()))]
+#[tracing::instrument(skip(input), fields(input_first_line = input.split("\n").next().unwrap()))]
 fn parse_seedmaps(input: &str) -> IResult<&str, (Vec<u64>, Vec<SeedMap>)> {
     let (input, seeds) = tag("seeds: ")
         .precedes(separated_list1(space1, complete::u64))
