@@ -8,6 +8,7 @@ use nom::{
     IResult, Parser,
 };
 use nom_supreme::{tag::complete::tag, ParserExt};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::ops::Range;
 use tracing::info;
 
@@ -73,21 +74,21 @@ fn parse_seedmaps(input: &str) -> IResult<&str, (Vec<Range<u64>>, Vec<SeedMap>)>
 pub fn process(input: &str) -> Result<String, Box<dyn std::error::Error>> {
     let (_, (seeds, maps)) = parse_seedmaps(input).expect("a valid parse");
 
-    let locations = seeds
-        .iter()
-        .flat_map(|range| range.clone().into_iter())
-        .collect::<Vec<u64>>();
-    let locations = locations
-        .into_iter()
-        .progress()
+    // let locations = seeds
+    //     .iter()
+    //     .flat_map(|range| range.clone().into_iter())
+    //     .collect::<Vec<u64>>();
+    // let locations = locations
+    //     .into_iter()
+    //     .progress()
+    //     .map(|seed| maps.iter().fold(seed, |seed, map| map.translate(seed)))
+    //     .collect::<Vec<u64>>();
+    let minimum_location = seeds
+        .into_par_iter()
+        .flat_map(|range| range.clone())
         .map(|seed| maps.iter().fold(seed, |seed, map| map.translate(seed)))
-        .collect::<Vec<u64>>();
-
-    Ok(locations
-        .iter()
-        .min()
-        .expect("should have a minimum location value")
-        .to_string())
+        .min();
+    Ok(minimum_location.expect("Minimum location").to_string())
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = aochelpers::get_daily_input(5, 2023)?;

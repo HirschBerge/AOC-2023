@@ -208,6 +208,7 @@ dependencies = [
  "indicatif",
  "nom",
  "nom-supreme",
+ "rayon",
  "tracing",
  "tracing-tracy",
 ]
