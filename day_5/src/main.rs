@@ -2,6 +2,7 @@ use nom::{
     bytes::complete::take_until,
     character::complete::{self, line_ending, space1},
     multi::{many1, separated_list1},
+    sequence::separated_pair,
     sequence::tuple,
     IResult, Parser,
 };
@@ -17,37 +18,34 @@ struct SeedMap {
 }
 
 impl SeedMap {
-    fn translate(&self, source: u64) -> u64 {
+    fn translate(&self, src: u64) -> u64 {
         let valid_mapping = self
             .mappings
             .iter()
-            .find(|(source_range, _)| source_range.contains(&source));
+            .find(|(src_range, _)| src_range.contains(&src));
 
-        let Some((source_range, destination_range)) =
+        let Some((src_range, dest_range)) =
             valid_mapping
         else {
-            return source;
+            return src;
         };
 
-        let offset = source - source_range.start;
+        let offset = src - src_range.start;
 
-        destination_range.start + offset
+        dest_range.start + offset
     }
 }
 
 #[tracing::instrument(skip(input))]
 fn line(input: &str) -> IResult<&str, (Range<u64>, Range<u64>)> {
-    let (input, (destination, source, num)) = tuple((
+    let (input, (dest, src, num)) = tuple((
         complete::u64,
         complete::u64.preceded_by(tag(" ")),
         complete::u64.preceded_by(tag(" ")),
     ))(input)?;
 
-    // dbg!(destination, num);
-    Ok((
-        input,
-        (source..(source + num), destination..(destination + num)),
-    ))
+    // dbg!(dest, num);
+    Ok((input, (src..(src + num), dest..(dest + num))))
 }
 fn seed_map(input: &str) -> IResult<&str, SeedMap> {
     take_until("map:")
@@ -56,9 +54,13 @@ fn seed_map(input: &str) -> IResult<&str, SeedMap> {
         .parse(input)
 }
 // #[tracing::instrument(skip(input), fields(input_first_line = input.split("\n").next().unwrap()))]
-fn parse_seedmaps(input: &str) -> IResult<&str, (Vec<u64>, Vec<SeedMap>)> {
+fn parse_seedmaps(input: &str) -> IResult<&str, (Vec<Range<u64>>, Vec<SeedMap>)> {
     let (input, seeds) = tag("seeds: ")
-        .precedes(separated_list1(space1, complete::u64))
+        .precedes(separated_list1(
+            space1,
+            separated_pair(complete::u64, tag(" "), complete::u64)
+                .map(|(start, offset)| (start..(start + offset))),
+        ))
         .parse(input)?;
     info!(?seeds);
     let (input, maps) = many1(seed_map)(input)?;
@@ -72,7 +74,8 @@ pub fn process(input: &str) -> Result<String, Box<dyn std::error::Error>> {
 
     let locations = seeds
         .iter()
-        .map(|seed| maps.iter().fold(*seed, |seed, map| map.translate(seed)))
+        .flat_map(|range| range.clone().into_iter())
+        .map(|seed| maps.iter().fold(seed, |seed, map| map.translate(seed)))
         .collect::<Vec<u64>>();
 
     Ok(locations
@@ -127,7 +130,7 @@ temperature-to-humidity map:
 humidity-to-location map:
 60 56 37
 56 93 4";
-        assert_eq!("35", process(input)?);
+        assert_eq!("46", process(input)?);
         Ok(())
     }
 }
