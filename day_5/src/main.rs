@@ -1,3 +1,4 @@
+use indicatif::ProgressIterator;
 use nom::{
     bytes::complete::take_until,
     character::complete::{self, line_ending, space1},
@@ -75,6 +76,10 @@ pub fn process(input: &str) -> Result<String, Box<dyn std::error::Error>> {
     let locations = seeds
         .iter()
         .flat_map(|range| range.clone().into_iter())
+        .collect::<Vec<u64>>();
+    let locations = locations
+        .into_iter()
+        .progress()
         .map(|seed| maps.iter().fold(seed, |seed, map| map.translate(seed)))
         .collect::<Vec<u64>>();
 
