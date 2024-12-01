@@ -42,6 +42,7 @@
           cargo-watch
           rust-analyzer
           bacon
+          cargo-generate
         ];
       };
     });
