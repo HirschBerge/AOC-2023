@@ -1,126 +1,97 @@
 use aochelpers::get_daily_input;
+use nom::{
+    bytes::complete::take_while1,
+    character::complete::{line_ending, space1},
+    combinator::map_res,
+    multi::separated_list1,
+    sequence::separated_pair,
+    IResult,
+};
 use std::error::Error;
+use std::str::FromStr;
 
-const WORDVALUES: [(&str, i32); 9] = [
-    ("one", 1),
-    ("two", 2),
-    ("three", 3),
-    ("four", 4),
-    ("five", 5),
-    ("six", 6),
-    ("seven", 7),
-    ("eight", 8),
-    ("nine", 9),
-];
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let data = get_daily_input(1, 2023)?;
-    println!("Part 1 result: {}", answer(&data, false));
-    println!("Part 2 result: {}", answer(&data, true));
-
-    Ok(())
+fn parse_line(input: &str) -> IResult<&str, Vec<(i32, i32)>> {
+    separated_list1(
+        line_ending,
+        separated_pair(
+            map_res(take_while1(|c: char| c.is_ascii_digit()), i32::from_str),
+            space1,
+            map_res(take_while1(|c: char| c.is_ascii_digit()), i32::from_str),
+        ),
+    )(input)
 }
 
-fn answer(data: &str, part2: bool) -> i32 {
-    let mut result = 0;
-    for line in data.split('\n') {
-        // println!("{}", first_number(line, part2) * 10 + last_number(line, part2));
-        result += first_number(line, part2) * 10 + last_number(line, part2)
-    }
-    result
+fn parse_input(input: &str) -> IResult<&str, (Vec<i32>, Vec<i32>)> {
+    let (input, lines) = parse_line(input)?;
+    // HACK: Create as muts so we can sort
+    let (mut first_numbers, mut second_numbers): (Vec<i32>, Vec<i32>) = lines.into_iter().unzip();
+    first_numbers.sort();
+    second_numbers.sort();
+    Ok((input, (first_numbers, second_numbers)))
 }
 
-fn first_number(s: &str, part2: bool) -> i32 {
-    if s.is_empty() {
-        0
-    } else if let Some(v) = s.chars().next().unwrap_or('z').to_digit(10) {
-        v as i32
-    } else if let Some(v) = WORDVALUES.iter().find_map(|(w, v)| {
-        if part2 && s.starts_with(w) {
-            Some(v)
-        } else {
-            None
+// INFO: Just grabs the data from AOC
+fn get_input() -> Result<String, Box<dyn Error>> {
+    let data = get_daily_input(1, 2024)?;
+    Ok(data)
+}
+
+fn main() {
+    let answer = match get_input() {
+        Ok(ans) => ans,
+        Err(e) => {
+            eprintln!("Failed to get input for today with: {}", e);
+            return;
         }
-    }) {
-        *v
-    } else {
-        first_number(&s[1..], part2)
-    }
-}
+    };
+    let result = parse_input(answer.as_str());
 
-fn last_number(s: &str, part2: bool) -> i32 {
-    if s.is_empty() {
-        0
-    } else if let Some(v) = s.chars().last().unwrap_or('z').to_digit(10) {
-        v as i32
-    } else if let Some(v) = WORDVALUES.iter().find_map(|(w, v)| {
-        if part2 && s.ends_with(w) {
-            Some(v)
-        } else {
-            None
+    let (first, second) = match result {
+        Ok((_, (first_numbers, second_numbers))) => (first_numbers, second_numbers),
+        Err(e) => {
+            eprintln!("Error: {:?}", e);
+            return;
         }
-    }) {
-        *v
-    } else {
-        last_number(&s[..s.len() - 1], part2)
+    };
+    let total_diff = sum_distance(first, second);
+    println!("{}", total_diff);
+}
+fn sum_distance(left: Vec<i32>, right: Vec<i32>) -> i32 {
+    let mut total = 0;
+    for (first, second) in left.iter().zip(right.iter()) {
+        total += (first - second).abs();
     }
+    total
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::{parse_input, sum_distance};
 
     #[test]
-    fn test_first_number_part1() {
-        assert_eq!(first_number("1abc2", false), 1);
-        assert_eq!(first_number("pqr3stu8vwx", false), 3);
-        assert_eq!(first_number("a1b2c3d4e5f", false), 1);
-        assert_eq!(first_number("treb7uchet", false), 7);
-    }
-    #[test]
-    fn test_last_number_part1() {
-        assert_eq!(last_number("1abc2", false), 2);
-        assert_eq!(last_number("pqr3stu8vwx", false), 8);
-        assert_eq!(last_number("a1b2c3d4e5f", false), 5);
-        assert_eq!(last_number("treb7uchet", false), 7);
-    }
-    #[test]
-    fn test_first_number_part2() {
-        assert_eq!(first_number("two1nine", true), 2);
-        assert_eq!(first_number("eightwothree", true), 8);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("xtwone3four", true), 2);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("4nineeightseven2", true), 4);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("zoneight234", true), 1);
-        assert_eq!(first_number("abcone2threexyz", true), 1);
-        assert_eq!(first_number("7pqrstsixteen", true), 7);
-    }
+    fn test_parse_input() {
+        let input = "3   4
+4   3
+2   5
+1   3
+3   9
+3   3";
 
-    #[test]
-    fn test_part1() {
-        let data: &str = "1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet";
-        let part1_res = answer(data, false);
-        assert_eq!(part1_res, 142);
+        let expected_output = (vec![1, 2, 3, 3, 3, 4], vec![3, 3, 3, 4, 5, 9]);
+        let result = parse_input(input);
+        assert_eq!(result, Ok(("", expected_output)));
     }
-
     #[test]
-    fn test_part2() {
-        let data = "two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen";
-        let part1_res = answer(data, true);
-        assert_eq!(part1_res, 281);
+    fn test_sum_total() {
+        let input = "3   4
+4   3
+2   5
+1   3
+3   9
+3   3";
+
+        let (_, (left, right)) = parse_input(input).unwrap();
+        let total = sum_distance(left, right);
+        assert_eq!(total, 11);
     }
 }
