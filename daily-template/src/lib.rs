@@ -8,7 +8,7 @@ use nom::{
     IResult,
 };
 pub mod part1;
-pub mod part1;
+pub mod part2;
 use std::str::FromStr;
 use std::{collections::HashMap, error::Error};
 
