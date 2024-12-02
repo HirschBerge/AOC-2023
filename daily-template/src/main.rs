@@ -1,12 +1,13 @@
-use {{crate_name}}::*;
+use {{crate_name}}::{part1::part1, part2::_part2};
 
 fn main() {
-    println!("Hello world!")
+    part1();
+    // _part2();
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
+    // use crate::*;
 
     #[test]
     fn test_one() {

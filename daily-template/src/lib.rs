@@ -9,27 +9,17 @@ use nom::{
 };
 pub mod part1;
 pub mod part2;
-use std::str::FromStr;
-use std::{collections::HashMap, error::Error};
+use std::error::Error;
+use std::{process::exit, str::FromStr};
 
-pub fn gather_data() -> Option<(Vec<i32>, Vec<i32>)> {
-    let answer = match get_input() {
+pub fn gather_data() -> String {
+    match get_input() {
         Ok(ans) => ans,
         Err(e) => {
             eprintln!("Failed to get input for today with: {}", e);
-            return None;
+            exit(1)
         }
-    };
-    let result = return_sorted_nums(answer.as_str());
-
-    let (left_list, right_list) = match result {
-        Ok((_, (left_ids, right_ids))) => (left_ids, right_ids),
-        Err(e) => {
-            eprintln!("Error: {:?}", e);
-            return None;
-        }
-    };
-    Some((left_list, right_list))
+    }
 }
 
 // INFO: Just grabs the data from AOC
@@ -40,7 +30,7 @@ pub fn get_input() -> Result<String, Box<dyn Error>> {
 
 // NOTE: Handling input data
 
-pub fn nom_into_nums(input: &str) -> IResult<&str, Vec<(i32, i32)>> {
+pub fn _nom_into_nums(input: &str) -> IResult<&str, Vec<(i32, i32)>> {
     separated_list1(
         line_ending,
         separated_pair(
