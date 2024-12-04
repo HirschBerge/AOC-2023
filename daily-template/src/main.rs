@@ -1,4 +1,4 @@
-use day_3::{part1::part1, part2::part2};
+use {{crate_name}}::{part1::part1, part2::part2};
 
 fn main() {
     println!("Part 1: {}", part1());
