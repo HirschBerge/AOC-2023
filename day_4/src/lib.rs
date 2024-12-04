@@ -1,3 +1,4 @@
+use glam::IVec2;
 use nom::{
     bytes::complete::take_while1,
     character::complete::{line_ending, space1},
@@ -8,7 +9,29 @@ use nom::{
 };
 pub mod part1;
 pub mod part2;
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
+
+const DIRECTIONS: [[IVec2; 3]; 8] = [
+    [IVec2::new(0, 1), IVec2::new(0, 2), IVec2::new(0, 3)],
+    [IVec2::new(0, -1), IVec2::new(0, -2), IVec2::new(0, -3)],
+    [IVec2::new(1, 1), IVec2::new(2, 2), IVec2::new(3, 3)],
+    [IVec2::new(1, -1), IVec2::new(2, -2), IVec2::new(3, -3)],
+    [IVec2::new(-1, 1), IVec2::new(-2, 2), IVec2::new(-3, 3)],
+    [IVec2::new(-1, -1), IVec2::new(-2, -2), IVec2::new(-3, -3)],
+    [IVec2::new(1, 0), IVec2::new(2, 0), IVec2::new(3, 0)],
+    [IVec2::new(-1, 0), IVec2::new(-2, 0), IVec2::new(-3, 0)],
+];
+
+fn process_data(data: String) -> HashMap<IVec2, char> {
+    data.lines()
+        .enumerate()
+        .flat_map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(move |(x, value)| (IVec2::new(x as i32, y as i32), value))
+        })
+        .collect::<HashMap<IVec2, char>>()
+}
 
 pub fn get_daily_input(year: i32, day: i32) -> String {
     let path = format!("../.inputs/{}/{}", year, day);
