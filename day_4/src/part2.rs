@@ -12,32 +12,35 @@ const DIRECTIONS: [[IVec2; 2]; 4] = [
 
 fn get_xmas(input: String) -> usize {
     let positions = process_data(input);
-    let mas = ['M', 'A', 'S'];
+    let remaining_chars = ['M', 'S'];
     positions
         .iter()
-        .filter(|(_, value)| **value == 'X')
-        .map(|(position, _)| {
-            let count = DIRECTIONS
+        // Checks the letter you're looking for
+        .filter(|(_, value)| **value == 'A')
+        .filter(|(position, _)| {
+            DIRECTIONS
                 .iter()
+                // Gets the possible locations
                 .map(|mas_positions| {
                     mas_positions
                         .iter()
-                        .map(|pos| positions.get(&(position + pos)))
+                        .map(|offset| positions.get(&(*position + offset)))
                         .enumerate()
-                        .all(|(index, value)| mas.get(index) == value)
+                        .all(|(index, value)| remaining_chars.get(index) == value)
                 })
                 .filter(|b| *b)
-                .count();
-            count
+                .count()
+                // NOTE:
+                // There are only two possible methods of maxing an 'X' with three letters
+                == 2
         })
-        .sum()
+        // Now count up the total times that it returns 2
+        .count()
 }
 
 pub fn part2() -> usize {
     let data = get_daily_input(2024, 4);
-    get_xmas(data.clone())
-    // data
-    // todo!("working on it");
+    get_xmas(data)
 }
 
 #[cfg(test)]
@@ -58,6 +61,6 @@ SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX";
         let result = get_xmas(data.to_owned());
-        assert_eq!(result, 18);
+        assert_eq!(result, 9);
     }
 }

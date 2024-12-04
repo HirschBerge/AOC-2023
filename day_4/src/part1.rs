@@ -40,7 +40,7 @@ fn get_xmas(input: String) -> usize {
 
 pub fn part1() -> usize {
     let data = get_daily_input(2024, 4);
-    get_xmas(data.clone())
+    get_xmas(data)
     // data
     // todo!("working on it");
 }
