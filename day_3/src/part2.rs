@@ -1,4 +1,4 @@
-use crate::gather_data;
+use crate::get_daily_input;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -53,7 +53,7 @@ pub fn mul_2(prog_mem: &str) -> IResult<&str, Vec<Instruction>> {
     many1(many_till(anychar, do_or_dont).map(|(_, ins)| ins))(prog_mem)
 }
 pub fn part2() -> u32 {
-    let data = gather_data();
+    let data = get_daily_input(2024, 3);
     let (_, data) = mul_2(data.as_str()).unwrap();
     let (_, total) = data
         .into_iter()

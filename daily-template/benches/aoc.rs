@@ -1,4 +1,4 @@
-use {{crate_name}}::{part1::part1, part2::_part2};
+use {{crate_name}}::{part1::part1, part2::part2};
 
 fn main() {
     // Run registered benchmarks.

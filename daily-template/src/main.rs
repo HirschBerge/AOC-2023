@@ -1,8 +1,8 @@
-use {{crate_name}}::{part1::part1, part2::_part2};
+use day_3::{part1::part1, part2::part2};
 
 fn main() {
-    part1();
-    // _part2();
+    println!("Part 1: {}", part1());
+    println!("Part 2: {}", part2());
 }
 
 #[cfg(test)]

@@ -1,7 +1,7 @@
-use crate::{gather_data, mul};
+use crate::{get_daily_input, mul};
 
 pub fn part1() -> u32 {
-    let data = gather_data();
+    let data = get_daily_input(2024, 3);
     let (_, data) = mul(data.as_str()).unwrap();
     data.into_iter().fold(0, |totes, instruct| {
             let value = instruct.multiply();

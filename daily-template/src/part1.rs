@@ -1,6 +1,6 @@
-use crate::gather_data;
+use crate::get_daily_input;
 
-pub fn part1() {
-    let data = gather_data();
-    println!("{}", data);
+pub fn part1() -> String {
+    let data = get_daily_input(2024, 3);
+    data
 }

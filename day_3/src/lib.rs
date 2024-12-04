@@ -1,4 +1,3 @@
-use aochelpers::get_daily_input;
 use nom::{
     bytes::complete::tag,
     character::complete::{self, anychar},
@@ -8,8 +7,6 @@ use nom::{
 };
 pub mod part1;
 pub mod part2;
-use std::error::Error;
-use std::process::exit;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Instruction {
@@ -23,21 +20,16 @@ impl Instruction {
         }
     }
 }
-
-pub fn gather_data() -> String {
-    match get_input() {
-        Ok(ans) => ans,
-        Err(e) => {
-            eprintln!("Failed to get input for today with: {}", e);
-            exit(1)
+pub fn get_daily_input(year: i32, day: i32)  -> String {
+    let path = format!("../.inputs/{}/{}", year, day);
+     match std::fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(err) => {
+            eprintln!("Error reading file: {}", err);
+            // Handle the error here, e.g., return an error code or exit the program
+            std::process::exit(1);
         }
     }
-}
-
-// INFO: Just grabs the data from AOC
-pub fn get_input() -> Result<String, Box<dyn Error>> {
-    let data = get_daily_input(3, 2024)?;
-    Ok(data)
 }
 
 // NOTE: Handling input data
