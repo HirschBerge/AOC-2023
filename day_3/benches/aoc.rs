@@ -1,4 +1,4 @@
-use day_3::{part1::part1, part2::_part2};
+use day_3::{part1::part1, part2::part2};
 
 fn main() {
     // Run registered benchmarks.
@@ -7,7 +7,6 @@ fn main() {
 
 #[divan::bench]
 fn bench_part1() {
-
     part1();
 }
 
