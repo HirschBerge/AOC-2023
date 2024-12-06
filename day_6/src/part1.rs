@@ -1,3 +1,4 @@
+use core::time;
 use std::collections::HashMap;
 
 use glam::IVec2;
@@ -20,11 +21,12 @@ fn move_right(pos: IVec2) -> IVec2 {
     pos + IVec2::new(1, 0)
 }
 
+#[derive(Debug)]
 enum Direction {
-    Up,
-    Down,
-    Right,
-    Left,
+    North,
+    South,
+    East,
+    West,
 }
 
 fn process_data(data: String) -> HashMap<IVec2, char> {
@@ -53,7 +55,7 @@ fn running(input: HashMap<IVec2, char>) -> usize {
     let mut moving = true;
     let mut current_item = starting_char;
     let mut locations: Vec<IVec2> = vec![current_item];
-    let mut direct = Direction::Up;
+    let mut direct = Direction::North;
     while moving {
         // dbg!(input.get(&current_item));
         let mut next_item = take_step(&direct, current_item);
@@ -61,6 +63,11 @@ fn running(input: HashMap<IVec2, char>) -> usize {
         match input.get(&next_item) {
             Some(next) => {
                 if *next == '#' {
+                    println!("Ouch! I ran into something...\nYou turn to your right, you are now facing: {:?}", direct);
+                    std::thread::sleep(time::Duration::from_millis(500));
+                    println!("You walk for a bit");
+                    std::thread::sleep(time::Duration::from_millis(1000));
+
                     direct = rotate(direct);
                     next_item = take_step(&direct, current_item);
                 }
@@ -81,19 +88,19 @@ fn running(input: HashMap<IVec2, char>) -> usize {
 
 fn take_step(direct: &Direction, current_item: IVec2) -> IVec2 {
     match direct {
-        Direction::Up => move_up(current_item),
-        Direction::Right => move_right(current_item),
-        Direction::Down => move_down(current_item),
-        Direction::Left => move_left(current_item),
+        Direction::North => move_up(current_item),
+        Direction::East => move_right(current_item),
+        Direction::South => move_down(current_item),
+        Direction::West => move_left(current_item),
     }
 }
 
 fn rotate(direct: Direction) -> Direction {
     match direct {
-        Direction::Up => Direction::Right,
-        Direction::Right => Direction::Down,
-        Direction::Down => Direction::Left,
-        Direction::Left => Direction::Up,
+        Direction::North => Direction::East,
+        Direction::East => Direction::South,
+        Direction::South => Direction::West,
+        Direction::West => Direction::North,
     }
 }
 

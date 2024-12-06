@@ -2,7 +2,7 @@ use crate::get_daily_input;
 
 pub fn part2() -> String {
     get_daily_input(2024, 6);
-    todo!("working on it");
+    todo!("I am probably not going to do part 2 for this day");
 }
 
 #[cfg(test)]
