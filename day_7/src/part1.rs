@@ -8,13 +8,21 @@ use nom::{
     IResult,
 };
 
+use rayon::prelude::*;
+
 use crate::get_daily_input;
 
 const OPERATORS: [char; 2] = ['*', '+'];
 
 pub fn part1() -> u64 {
     let data = get_daily_input(2024, 7);
-    let (_, set) = parse_totals(data.as_str()).unwrap();
+    let (_, set) = match parse_totals(data.as_str()) {
+        Ok(answer) => answer,
+        Err(e) => {
+            println!("Could not successfully parse today's input: {}", e);
+            std::process::exit(1);
+        }
+    };
     summing(set)
 }
 
@@ -32,7 +40,7 @@ fn parse_line(input: &str) -> IResult<&str, (u64, Vec<u64>)> {
 
 fn summing(numbers: Vec<(u64, Vec<u64>)>) -> u64 {
     numbers
-        .iter()
+        .par_iter()
         .filter_map(|(target, numbers)| {
             let num_of_nums = numbers.len() - 1;
             (0..num_of_nums)
@@ -43,12 +51,16 @@ fn summing(numbers: Vec<(u64, Vec<u64>)>) -> u64 {
                     let answer = numbers
                         .iter()
                         .copied()
-                        .reduce(|accumulator, next| match s.next().unwrap() {
-                            '*' => accumulator * next,
-                            '+' => accumulator + next,
-                            _ => panic!("This will never happen"),
+                        .reduce(|accumulator, next| match s.next() {
+                            Some(ans) => match ans {
+                                '*' => accumulator * next,
+                                '+' => accumulator + next,
+                                '|' => format!("{}{}", accumulator, next).parse::<u64>().expect("Expected to parse accum"),
+                                _ => panic!("This will never happen"),
+                            },
+                            None => panic!("Could not match s.next()!"),
                         })
-                        .unwrap();
+                        .expect("Expected a valid reduce");
                     *target == answer
                 })
                 .then_some(target)
