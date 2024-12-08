@@ -10,13 +10,11 @@ use nom::{
 
 use rayon::prelude::*;
 
-use crate::get_daily_input;
-
 const OPERATORS: [char; 2] = ['*', '+'];
 
 pub fn part1() -> u64 {
-    let data = get_daily_input(2024, 7);
-    let (_, set) = match parse_totals(data.as_str()) {
+    let data = include_str!("../input");
+    let (_, set) = match parse_totals(data) {
         Ok(answer) => answer,
         Err(e) => {
             println!("Could not successfully parse today's input: {}", e);
@@ -55,7 +53,9 @@ fn summing(numbers: Vec<(u64, Vec<u64>)>) -> u64 {
                             Some(ans) => match ans {
                                 '*' => accumulator * next,
                                 '+' => accumulator + next,
-                                '|' => format!("{}{}", accumulator, next).parse::<u64>().expect("Expected to parse accum"),
+                                '|' => format!("{}{}", accumulator, next)
+                                    .parse::<u64>()
+                                    .expect("Expected to parse accum"),
                                 _ => panic!("This will never happen"),
                             },
                             None => panic!("Could not match s.next()!"),

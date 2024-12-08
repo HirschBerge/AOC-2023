@@ -10,13 +10,11 @@ use nom::{
 
 use rayon::prelude::*;
 
-use crate::get_daily_input;
-
 const OPERATORS: [char; 3] = ['*', '+', '|'];
 
 pub fn part2() -> u64 {
-    let data = get_daily_input(2024, 7);
-    let (_, set) = match parse_totals(data.as_str()) {
+    let data = include_str!("../input");
+    let (_, set) = match parse_totals(data) {
         Ok(answer) => answer,
         Err(e) => {
             println!("Could not successfully parse today's input: {}", e);
