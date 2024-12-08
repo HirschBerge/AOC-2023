@@ -18,4 +18,6 @@ def --env generate_new_day [ day: string year: string ] {
   nix develop -c cargo generate --path ./daily-template/ --name $formatted_day
   cd $"./($formatted_day)/"
   sd '\([\d]{4}, \d\)' $"\(($year), ($day)\)"  src/*.rs
+  print "Enter password"
+  sudo ln -s $"($env.HOME)/projects/AdventOfCode/.inputs/($year)/($day)" $"($env.HOME)/projects/AdventOfCode/day_($day)/input"
 }

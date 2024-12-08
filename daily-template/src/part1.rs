@@ -1,7 +1,5 @@
-use crate::get_daily_input;
-
-pub fn part1() -> String {
-    let data = get_daily_input(2024, 3);
+pub fn part1() -> &'static str {
+    let data = include_str!("../input");
     data
 }
 

@@ -1,7 +1,6 @@
-use crate::get_daily_input;
-
-pub fn part2() -> String {
-    get_daily_input(2024, 3)
+pub fn part2() -> &'static str {
+    include_str!("../input");
+    todo!("I haven't reached part 2 yet");
 }
 
 #[cfg(test)]
