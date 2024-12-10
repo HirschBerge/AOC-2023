@@ -19,5 +19,5 @@ def --env generate_new_day [ day: string year: string ] {
   cd $"./($formatted_day)/"
   sd '\([\d]{4}, \d\)' $"\(($year), ($day)\)"  src/*.rs
   print "Enter password"
-  sudo ln -s $"($env.HOME)/projects/AdventOfCode/.inputs/($year)/($day)" $"($env.HOME)/projects/AdventOfCode/day_($day)/input"
+  sudo ln -s $"($env.HOME)/projects/AdventOfCode/.inputs/($year)/($day)" $"($env.HOME)/projects/AdventOfCode/($year)/day_($day)/input"
 }
