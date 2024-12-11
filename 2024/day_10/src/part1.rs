@@ -7,11 +7,15 @@ use nom::{
     IResult,
 };
 use nom_locate::{position, LocatedSpan};
+use pathfinding::prelude::*;
 
 pub fn part1() -> &'static str {
     let data = include_str!("../input");
-    data
+    kinda_main(data.into());
+    "Temp"
 }
+
+const DIRECTIONS: [IVec2; 4] = [IVec2::X, IVec2::NEG_X, IVec2::Y, IVec2::NEG_Y];
 
 pub type Span<'a> = LocatedSpan<&'a str>;
 fn alphanum_pos(input: Span) -> IResult<Span, (IVec2, u32)> {
@@ -33,20 +37,40 @@ pub fn parse(input: Span) -> IResult<Span, HashMap<IVec2, u32>> {
 
     Ok((input, hashmap))
 }
+pub fn kinda_main(input: Span) {
+    let trailheads: HashMap<IVec2, u32> = match parse(input) {
+        Ok((_, locations)) => locations
+            .into_iter()
+            .filter(|(_, height)| *height == 0)
+            .collect(),
+        Err(e) => {
+            eprintln!("Uh oh! {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    dbg!(trailheads);
+}
 
 #[cfg(test)]
 mod tests {
     // use crate::*;
 
+    use crate::part1::{kinda_main, Span};
+
+    #[test]
     fn test_process() {
-        let input = "89010123
+        let input = Span::from(
+            "89010123
 78121874
 87430965
 96549874
 45678903
 32019012
 01329801
-10456732";
+10456732",
+        );
+        kinda_main(input);
         assert_eq!(1, 99);
     }
 }
