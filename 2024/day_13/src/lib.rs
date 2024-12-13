@@ -38,7 +38,7 @@ pub fn _nom_into_nums(input: &str) -> IResult<&str, Vec<(usize, usize)>> {
 }
 
 #[derive(Debug)]
-struct Machine {
+pub struct Machine {
     a: IVec2,
     b: IVec2,
     prize: IVec2,
@@ -72,6 +72,6 @@ fn machine(input: &str) -> IResult<&str, Machine> {
 
     Ok((input, Machine { a, b, prize: p }))
 }
-fn parse(input: &str) -> IResult<&str, Vec<Machine>> {
+pub fn parse(input: &str) -> IResult<&str, Vec<Machine>> {
     separated_list1(tuple((line_ending, line_ending)), machine)(input)
 }

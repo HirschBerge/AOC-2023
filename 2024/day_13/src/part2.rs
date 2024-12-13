@@ -17,7 +17,7 @@ pub fn linear_alg(input: &str) -> isize {
         .fold(0, |acc, machine| acc + solve_machine(machine));
     total
 }
-fn solve_machine(machine: &Machine) -> isize {
+pub fn solve_machine(machine: &Machine) -> isize {
     let offset: isize = 10_000_000_000_000;
     let prize = (
         machine.prize.x as isize + offset,

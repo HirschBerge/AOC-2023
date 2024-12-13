@@ -18,7 +18,7 @@ pub fn linear_alg(input: &str) -> isize {
         .fold(0, |acc, machine| acc + solve_machine(machine));
     total
 }
-fn solve_machine(machine: &Machine) -> isize {
+pub fn solve_machine(machine: &Machine) -> isize {
     let prize = (machine.prize.x, machine.prize.y);
     let determinanterminent = machine.a.x * machine.b.y - machine.a.y * machine.b.x;
     let a = (prize.0 * machine.b.y - prize.1 * machine.b.x) / determinanterminent;
